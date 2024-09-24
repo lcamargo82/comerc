@@ -64,7 +64,7 @@ docker-compose exec app php artisan test
 ```
 
 ## Acesso à API
-A API estará disponível em http://localhost:8000.
+A API estará disponível em http://localhost.
 
 ## Observações
 - Certifique-se de que suas portas no Docker não estejam em conflito com outras aplicações.
