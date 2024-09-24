@@ -60,8 +60,7 @@ class OrderService
         $this->validate($data);
 
         $order = $this->orderRepository->create($data);
-        $order->load('client');
-        $order->load('product');
+        $order->load('client', 'product');
 
         if (isset($order->client->user->email)) {
             Mail::to($order->client->user->email)->send(new OrderCreatedMail($order));

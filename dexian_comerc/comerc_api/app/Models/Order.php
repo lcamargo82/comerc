@@ -11,6 +11,10 @@ class Order extends Model
 {
     use HasFactory, SoftDeletes;
 
+    const STATUS_PENDING = 1;
+    const STATUS_CONFIRMED = 2;
+    const STATUS_CANCELED = 3;
+
     protected $fillable = [
         'client_id',
         'product_id',

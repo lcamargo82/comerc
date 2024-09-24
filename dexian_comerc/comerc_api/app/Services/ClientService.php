@@ -71,7 +71,7 @@ class ClientService
 
         $this->validate($data);
 
-        $this->clientRepository->update($client, $data);
+        $this->clientRepository->update($id, $data);
 
         return $client;
     }
@@ -89,7 +89,7 @@ class ClientService
             throw new \Exception("Client not found", 404);
         }
 
-        return $this->clientRepository->delete($client);
+        return $this->clientRepository->delete($client->id);
     }
 
     /**

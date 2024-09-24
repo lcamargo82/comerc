@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('password');
             $table->enum('type', [1, 2]);
             $table->rememberToken();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

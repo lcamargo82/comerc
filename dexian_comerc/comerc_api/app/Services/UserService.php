@@ -69,9 +69,19 @@ class UserService
             throw new \Exception("Client not found", 404);
         }
 
-        $this->validate($data);
+        $this->validateForUpdate($data);
 
-        $this->userRepository->update($id, $data);
+        $user->name = $data['name'];
+
+        if (isset($data['email'])) {
+            $user->email = $data['email'];
+        }
+
+        if (isset($data['password'])) {
+            $user->password = bcrypt($data['password']);
+        }
+
+        $this->userRepository->update($id, $user->toArray());
 
         return $user;
     }
@@ -103,6 +113,24 @@ class UserService
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        if ($validator->fails()) {
+            throw new ValidationException($validator);
+        }
+    }
+
+    /**
+     * @param array $data
+     * @return void
+     * @throws ValidationException
+     */
+    protected function validateForUpdate(array $data)
+    {
+        $validator = Validator::make($data, [
+            'name' => 'sometimes|string|max:255',
+            'email' => 'sometimes|string|email|max:255|unique:users',
+            'password' => 'sometimes|string|min:8|confirmed',
         ]);
 
         if ($validator->fails()) {
