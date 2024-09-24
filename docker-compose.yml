@@ -1,0 +1,37 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: comerc_app
+    networks:
+      - comerc_network
+    depends_on:
+      - db
+    user: "1000:1000"
+    volumes:
+      - ./dexian_comerc/comerc_api:/var/www
+    ports:
+    - "80:8000"
+    command: php artisan serve --host=0.0.0.0 --port=8000
+
+  db:
+    image: postgres:14
+    container_name: postgres_db
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: comerc
+      POSTGRES_USER: comerc
+      POSTGRES_PASSWORD: comerc
+    networks:
+      - comerc_network
+    ports:
+      - "5432:5432"
+
+networks:
+  comerc_network:
+    driver: bridge
+
+volumes:
+  pgdata:
