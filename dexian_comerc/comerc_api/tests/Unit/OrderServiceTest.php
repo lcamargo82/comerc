@@ -59,7 +59,7 @@ class OrderServiceTest extends TestCase
     public function testGetOrderThrowsExceptionIfNotFound()
     {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage("Client not found");
+        $this->expectExceptionMessage("Order not found");
 
         $this->orderRepository->shouldReceive('find')->with(999)->once()->andReturn(null);
 
@@ -112,10 +112,42 @@ class OrderServiceTest extends TestCase
     public function testUpdateOrderThrowsExceptionIfNotFound()
     {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage("Client not found");
+        $this->expectExceptionMessage("Order not found");
 
         $this->orderRepository->shouldReceive('find')->with(999)->once()->andReturn(null);
 
         $this->orderService->updateOrder(999, []);
+    }
+
+    public function testCreateOrderThrowsExceptionIfClientHasNoEmail()
+    {
+        Mail::fake();
+
+        $user = User::factory()->create();
+        $user->email = 'test';
+        $user->save();
+
+        $client = Client::factory()->create(['user_id' => $user->id]);
+
+        $product = Product::factory()->create();
+
+        $orderData = [
+            'client_id' => $client->id,
+            'product_id' => $product->id,
+        ];
+
+        $order = Order::factory()->make($orderData);
+
+        $this->orderRepository->shouldReceive('create')->once()->andReturn($order);
+
+        $order->setRelation('client', $client);
+        $order->setRelation('product', $product);
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage("The user does not have a valid email address.");
+
+        $this->orderService->createOrder($orderData);
+
+        Mail::assertNothingSent();
     }
 }

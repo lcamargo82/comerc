@@ -12,8 +12,27 @@ class ClientControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
-    public function canCreateClient()
+    public function testCannotListClientsWithoutAuthentication()
+    {
+        $response = $this->getJson('/api/users');
+
+        $response->assertStatus(JsonResponse::HTTP_UNAUTHORIZED)
+            ->assertJson([
+                'message' => 'Unauthenticated.'
+            ]);
+    }
+
+    public function testCannotAccessClientListWhenNotAuthenticated()
+    {
+        $response = $this->getJson('/api/users');
+
+        $response->assertStatus(JsonResponse::HTTP_UNAUTHORIZED)
+            ->assertJson([
+                'message' => 'Unauthenticated.'
+            ]);
+    }
+
+    public function testCanCreateClient()
     {
         $user = User::factory()->create();
 
@@ -34,8 +53,7 @@ class ClientControllerTest extends TestCase
         $this->assertDatabaseHas('clients', $data);
     }
 
-    /** @test */
-    public function canGetAllClients()
+    public function testCanGetAllClients()
     {
         $user = User::factory()->create();
 
@@ -47,8 +65,7 @@ class ClientControllerTest extends TestCase
             ->assertJsonCount(3);
     }
 
-    /** @test */
-    public function canGetSingleClient()
+    public function testCanGetSingleClient()
     {
         $user = User::factory()->create();
 
@@ -60,8 +77,7 @@ class ClientControllerTest extends TestCase
             ->assertJson(['id' => $client->id]);
     }
 
-    /** @test */
-    public function canUpdateClient()
+    public function testCanUpdateClient()
     {
         $user = User::factory()->create();
 
@@ -82,8 +98,7 @@ class ClientControllerTest extends TestCase
         $this->assertDatabaseHas('clients', array_merge(['id' => $client->id], $data));
     }
 
-    /** @test */
-    public function canDeleteClient()
+    public function testCanDeleteClient()
     {
         $user = User::factory()->create();
 
@@ -96,8 +111,7 @@ class ClientControllerTest extends TestCase
         $this->assertSoftDeleted('clients', ['id' => $client->id]);
     }
 
-    /** @test */
-    public function createClientWithInvalidData()
+    public function testCreateClientWithInvalidData()
     {
         $user = User::factory()->create();
 
@@ -112,8 +126,7 @@ class ClientControllerTest extends TestCase
             ->assertJsonStructure(['message']);
     }
 
-    /** @test */
-    public function cannotGetNonExistentClient()
+    public function testCannotGetNonExistentClient()
     {
         $user = User::factory()->create();
 
@@ -123,8 +136,7 @@ class ClientControllerTest extends TestCase
             ->assertJson(['message' => 'Client not found']);
     }
 
-    /** @test */
-    public function cannotUpdateNonExistentClient()
+    public function testCannotUpdateNonExistentClient()
     {
         $user = User::factory()->create();
 
@@ -139,8 +151,7 @@ class ClientControllerTest extends TestCase
             ->assertJson(['message' => 'Client not found']);
     }
 
-    /** @test */
-    public function cannotDeleteNonExistentClient()
+    public function testCannotDeleteNonExistentClient()
     {
         $user = User::factory()->create();
 

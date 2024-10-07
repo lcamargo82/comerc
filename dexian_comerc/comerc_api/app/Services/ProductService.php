@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Repositories\ProductRepository;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
@@ -37,7 +38,7 @@ class ProductService
         $product = $this->productRepository->find($id);
 
         if (!$product) {
-            throw new \Exception("Product not found", 404);
+            throw new \Exception("Product not found", JsonResponse::HTTP_NOT_FOUND);
         }
 
         return $product;
@@ -70,7 +71,7 @@ class ProductService
         $product = $this->productRepository->find($id);
 
         if (!$product) {
-            throw new \Exception("Product not found", 404);
+            throw new \Exception("Product not found", JsonResponse::HTTP_NOT_FOUND);
         }
 
         $this->validate($data);
@@ -94,7 +95,7 @@ class ProductService
         $product = $this->productRepository->find($id);
 
         if (!$product) {
-            throw new \Exception("Product not found", 404);
+            throw new \Exception("Product not found", JsonResponse::HTTP_NOT_FOUND);
         }
 
         $this->productRepository->delete($id);

@@ -6,6 +6,7 @@ use App\Mail\OrderCreatedMail;
 use App\Repositories\OrderRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -44,7 +45,7 @@ class OrderService
         $order = $this->orderRepository->find($id);
 
         if (!$order) {
-            throw new \Exception("Client not found", 404);
+            throw new \Exception("Order not found", JsonResponse::HTTP_NOT_FOUND);
         }
 
         return $order;
@@ -62,10 +63,12 @@ class OrderService
         $order = $this->orderRepository->create($data);
         $order->load('client', 'product');
 
-        if (isset($order->client->user->email)) {
+        $validEmail = filter_var($order->client->user->email, FILTER_VALIDATE_EMAIL);
+
+        if (isset($order->client->user->email) && $validEmail) {
             Mail::to($order->client->user->email)->send(new OrderCreatedMail($order));
         } else {
-            throw new \Exception("O usuário não tem um e-mail associado.");
+            throw new \Exception("The user does not have a valid email address.");
         }
 
         return $order;
@@ -82,7 +85,7 @@ class OrderService
         $order = $this->orderRepository->find($id);
 
         if (!$order) {
-            throw new \Exception("Client not found", 404);
+            throw new \Exception("Order not found", JsonResponse::HTTP_NOT_FOUND);
         }
 
         $this->validate($data);

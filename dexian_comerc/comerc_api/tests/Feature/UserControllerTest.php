@@ -22,6 +22,26 @@ class UserControllerTest extends TestCase
         $this->user = User::factory()->create();
     }
 
+    public function testCannotListUsersWithoutAuthentication()
+    {
+        $response = $this->getJson('/api/users');
+
+        $response->assertStatus(JsonResponse::HTTP_UNAUTHORIZED)
+            ->assertJson([
+                'message' => 'Unauthenticated.'
+            ]);
+    }
+
+    public function testCannotAccessUserListWhenNotAuthenticated()
+    {
+        $response = $this->getJson('/api/users');
+
+        $response->assertStatus(JsonResponse::HTTP_UNAUTHORIZED)
+            ->assertJson([
+                'message' => 'Unauthenticated.'
+            ]);
+    }
+
     public function testCanListUsers()
     {
         $user = User::factory()->create();
@@ -46,13 +66,13 @@ class UserControllerTest extends TestCase
 
         $userServiceMock->expects($this->once())
             ->method('getAllUsers')
-            ->will($this->throwException(new \Exception('Erro ao buscar usuários', 500)));
+            ->will($this->throwException(new \Exception('Erro ao buscar usuários', JsonResponse::HTTP_INTERNAL_SERVER_ERROR)));
 
         $controller = new UserController($userServiceMock);
 
         $response = $controller->index();
 
-        $this->assertEquals(500, $response->status());
+        $this->assertEquals(JsonResponse::HTTP_INTERNAL_SERVER_ERROR, $response->status());
         $this->assertJsonStringEqualsJsonString(
             json_encode(['message' => 'Erro ao buscar usuários']),
             $response->getContent()
@@ -64,7 +84,6 @@ class UserControllerTest extends TestCase
         $user = User::factory()->create();
 
         $userService = $this->mock(UserService::class);
-
 
         $userService->shouldReceive('getUser')
             ->once()
@@ -106,9 +125,11 @@ class UserControllerTest extends TestCase
             'password' => '123',
         ]);
 
-        $response->assertStatus(JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertStatus(JsonResponse::HTTP_BAD_REQUEST);
 
-        $response->assertJsonValidationErrors(['name', 'email', 'password']);
+        $response->assertJson([
+            'message' => 'The name field is required. (and 4 more errors)'
+        ]);
     }
 
     public function testCreateUserWithValidData()
@@ -139,9 +160,11 @@ class UserControllerTest extends TestCase
             'password' => 'password123',
         ]);
 
-        $response->assertStatus(422);
+        $response->assertStatus(JsonResponse::HTTP_BAD_REQUEST);
 
-        $response->assertJsonValidationErrors(['email']);
+        $response->assertJson([
+            'message' => 'The email field is required.'
+        ]);
     }
 
     public function testLoginWithInvalidEmailFormat()
@@ -151,9 +174,11 @@ class UserControllerTest extends TestCase
             'password' => 'password123',
         ]);
 
-        $response->assertStatus(422);
+        $response->assertStatus(JsonResponse::HTTP_BAD_REQUEST);
 
-        $response->assertJsonValidationErrors(['email']);
+        $response->assertJson([
+            'message' => 'The email field must be a valid email address.'
+        ]);
     }
 
     public function testCanUpdateUser()

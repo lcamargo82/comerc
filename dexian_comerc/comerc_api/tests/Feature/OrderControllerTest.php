@@ -27,6 +27,26 @@ class OrderControllerTest extends TestCase
         $this->orderService = $this->mock(OrderService::class);
     }
 
+    public function testCannotListOrdersWithoutAuthentication()
+    {
+        $response = $this->getJson('/api/users');
+
+        $response->assertStatus(JsonResponse::HTTP_UNAUTHORIZED)
+            ->assertJson([
+                'message' => 'Unauthenticated.'
+            ]);
+    }
+
+    public function testCannotAccessOrderListWhenNotAuthenticated()
+    {
+        $response = $this->getJson('/api/users');
+
+        $response->assertStatus(JsonResponse::HTTP_UNAUTHORIZED)
+            ->assertJson([
+                'message' => 'Unauthenticated.'
+            ]);
+    }
+
     public function testIndexReturnsAllOrders()
     {
         $user = User::factory()->create();

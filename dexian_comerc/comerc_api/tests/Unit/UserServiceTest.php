@@ -76,6 +76,40 @@ class UserServiceTest extends TestCase
         $this->userService->getUser(999);
     }
 
+    public function testUpdateUserThrowsExceptionWhenUserNotFound()
+    {
+        $userId = 999;
+        $data = [
+            'name' => 'Updated Name',
+            'email' => 'updatedemail@example.com'
+        ];
+
+        $this->userRepository->method('find')
+            ->with($userId)
+            ->willReturn(null);
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage("Client not found");
+        $this->expectExceptionCode(JsonResponse::HTTP_NOT_FOUND);
+
+        $this->userService->updateUser($userId, $data);
+    }
+
+    public function testDeleteUserThrowsExceptionWhenUserNotFound()
+    {
+        $userId = 999;
+
+        $this->userRepository->method('find')
+            ->with($userId)
+            ->willReturn(null);
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage("Client not found");
+        $this->expectExceptionCode(JsonResponse::HTTP_NOT_FOUND);
+
+        $this->userService->deleteUser($userId);
+    }
+
     protected function tearDown(): void
     {
         Mockery::close();

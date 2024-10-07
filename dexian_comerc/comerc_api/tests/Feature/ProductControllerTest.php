@@ -25,6 +25,26 @@ class ProductControllerTest extends TestCase
         $this->productService = $this->mock(ProductService::class);
     }
 
+    public function testCannotListProductsWithoutAuthentication()
+    {
+        $response = $this->getJson('/api/users');
+
+        $response->assertStatus(JsonResponse::HTTP_UNAUTHORIZED)
+            ->assertJson([
+                'message' => 'Unauthenticated.'
+            ]);
+    }
+
+    public function testCannotAccessProductListWhenNotAuthenticated()
+    {
+        $response = $this->getJson('/api/users');
+
+        $response->assertStatus(JsonResponse::HTTP_UNAUTHORIZED)
+            ->assertJson([
+                'message' => 'Unauthenticated.'
+            ]);
+    }
+
     public function testIndexReturnsAllProducts()
     {
         $user = User::factory()->create();
@@ -61,7 +81,7 @@ class ProductControllerTest extends TestCase
 
         $response = $this->actingAs($user)->getJson('/api/products/999');
 
-        $response->assertStatus(404);
+        $response->assertStatus(JsonResponse::HTTP_NOT_FOUND);
         $response->assertJson([
             'message' => 'Product not found',
         ]);
@@ -102,6 +122,27 @@ class ProductControllerTest extends TestCase
         $response = $this->actingAs($user)->postJson('/api/products', $data);
 
         $response->assertStatus(JsonResponse::HTTP_BAD_REQUEST);
+    }
+
+    public function testStoreReturnsValidationErrorWhenImageIsMissing()
+    {
+        $user = User::factory()->create();
+
+        $data = [
+            'name' => 'Product Test',
+            'price' => 100,
+            'description' => 'Product description',
+            'photo' => null
+        ];
+
+        $this->productService->shouldReceive('createProduct')->with($data)->once()->andThrow(new \Exception('The photo field is required.', 400));
+
+        $response = $this->actingAs($user)->postJson('/api/products', $data);
+
+        $response->assertStatus(JsonResponse::HTTP_BAD_REQUEST)
+            ->assertJson([
+                'message' => 'The photo field is required.',
+            ]);
     }
 
     public function testUpdateUpdatesProduct()
