@@ -29,7 +29,7 @@ class OrderCreatedMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Pedido #' . $this->order->id . ' Criado com Sucesso',
+            subject: 'Pedido #' . $this->order->id . ' Criado com Sucesso'
         );
     }
 

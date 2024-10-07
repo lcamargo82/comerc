@@ -23,8 +23,15 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = $this->userService->getAllUsers();
-        return response()->json($users);
+        try {
+            $users = $this->userService->getAllUsers();
+
+            return response()->json($users);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], $e->getCode() ?: 400);
+        }
     }
 
     /**

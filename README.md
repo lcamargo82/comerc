@@ -33,7 +33,17 @@ Copie o arquivo env.exemple para .env:
 cp .env.example .env
 ```
 
-### 4. Fazer o build do container
+### 4. Criar conta em Mailtrap
+
+Crie uma conta no portal mailtrap para envio dos emails seguindo os seguintes passos:
+
+1. Acesse https://mailtrap.io/
+2. Crie uma conta em SingUp
+3. Na página Home, acesse `Start testing`
+4. Em `My Inbox` -> `Code Samples` escolha `PHP` e selecione `Laravel 9+`
+5. Clique em `Copy` e cole no arquivo `.env` recém criado, substituindo os valores que estão indicados como `MAIL_TRAP`
+
+### 5. Fazer o build do container
 
 Faça o buid do container e suba a aplicação:
 
@@ -41,7 +51,7 @@ Faça o buid do container e suba a aplicação:
 docker-compose up --build
 ```
 
-### 5. Instalação das dependências do composer
+### 6. Instalação das dependências do composer
 
 Instale as dependências da aplicação:
 
@@ -49,14 +59,14 @@ Instale as dependências da aplicação:
 docker-compose exec app composer install --no-interaction
 ```
 
-### 6. Incia o server
+### 7. Incia o server
 
 Incia o server da aplicação Laravel:
 ```bash
 docker-compose exec app php artisan serve --host=0.0.0.0 --port=8000
 ```
 
-### 7. Rodar os teste automatizados
+### 8. Rodar os teste automatizados
 
 Incia os testes unitários:
 ```bash

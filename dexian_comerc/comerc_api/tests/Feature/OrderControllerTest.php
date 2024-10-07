@@ -19,8 +19,6 @@ class OrderControllerTest extends TestCase
     protected $user;
     protected $orderService;
 
-    protected $orderController;
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -54,6 +52,52 @@ class OrderControllerTest extends TestCase
         $response->assertStatus(JsonResponse::HTTP_OK);
         $response->assertJson($order->toArray());
     }
+
+    public function testShowThrowsException()
+    {
+        $this->orderService->shouldReceive('getOrder')
+            ->andThrow(new \Exception('Order not found', JsonResponse::HTTP_NOT_FOUND));
+
+        $response = $this->json('GET', '/orders/1');
+
+        $response->assertStatus(JsonResponse::HTTP_NOT_FOUND)
+            ->assertJson([
+                'message' => 'The route orders/1 could not be found.',
+            ]);
+    }
+
+    public function testStoreThrowsException()
+    {
+        $this->orderService->shouldReceive('createOrder')
+            ->andThrow(new \Exception('Failed to create order', JsonResponse::HTTP_NOT_FOUND));
+
+        $response = $this->json('POST', '/orders', [
+            'product_id' => 1,
+            'quantity' => 2,
+        ]);
+
+        $response->assertStatus(JsonResponse::HTTP_NOT_FOUND)
+            ->assertJson([
+                'message' => 'The route orders could not be found.',
+            ]);
+    }
+
+    public function testUpdateThrowsException()
+    {
+        $this->orderService->shouldReceive('updateOrder')
+            ->andThrow(new \Exception('Failed to update order', JsonResponse::HTTP_NOT_FOUND));
+
+        $response = $this->json('PUT', '/orders/1', [
+            'product_id' => 1,
+            'quantity' => 3,
+        ]);
+
+        $response->assertStatus(JsonResponse::HTTP_NOT_FOUND)
+            ->assertJson([
+                'message' => 'The route orders/1 could not be found.',
+            ]);
+    }
+
 
     public function testStoreCreatesOrder()
     {

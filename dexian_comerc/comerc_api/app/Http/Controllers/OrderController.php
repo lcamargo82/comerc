@@ -39,6 +39,7 @@ class OrderController extends Controller
 
             return response()->json($order);
         } catch (\Exception $e) {
+            dd($e->getMessage());
             return response()->json([
                 'message' => $e->getMessage(),
             ], $e->getCode() ?: 400);

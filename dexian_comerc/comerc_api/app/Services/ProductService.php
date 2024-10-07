@@ -105,7 +105,7 @@ class ProductService
      * @return void
      * @throws ValidationException
      */
-    protected function validate(array $data): void
+    public function validate(array $data): void
     {
         $validator = Validator::make($data, [
             'name'  => 'required|string|max:255',
@@ -122,7 +122,7 @@ class ProductService
      * @param $image
      * @return string
      */
-    protected function uploadImage($image): string
+    public function uploadImage($image): string
     {
         return $image->store('products', 'public');
     }

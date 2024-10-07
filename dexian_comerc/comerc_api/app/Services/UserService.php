@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Repositories\UserRepository;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
@@ -37,7 +38,7 @@ class UserService
         $user = $this->userRepository->find($id);
 
         if (!$user) {
-            throw new \Exception("Client not found", 404);
+            throw new \Exception("Client not found",JsonResponse::HTTP_NOT_FOUND);
         }
 
         return $user;
@@ -66,7 +67,7 @@ class UserService
         $user = $this->userRepository->find($id);
 
         if (!$user) {
-            throw new \Exception("Client not found", 404);
+            throw new \Exception("Client not found", JsonResponse::HTTP_NOT_FOUND);
         }
 
         $this->validateForUpdate($data);
@@ -96,7 +97,7 @@ class UserService
         $user = $this->userRepository->find($id);
 
         if (!$user) {
-            throw new \Exception("Client not found", 404);
+            throw new \Exception("Client not found", JsonResponse::HTTP_NOT_FOUND);
         }
 
         return $this->userRepository->delete($id);
@@ -107,7 +108,7 @@ class UserService
      * @return void
      * @throws ValidationException
      */
-    protected function validate(array $data)
+    public function validate(array $data)
     {
         $validator = Validator::make($data, [
             'name' => 'required|string|max:255',
@@ -125,7 +126,7 @@ class UserService
      * @return void
      * @throws ValidationException
      */
-    protected function validateForUpdate(array $data)
+    public function validateForUpdate(array $data)
     {
         $validator = Validator::make($data, [
             'name' => 'sometimes|string|max:255',

@@ -66,7 +66,6 @@ class ProductServiceTest extends TestCase
 
         $this->productRepository->shouldReceive('create')->once()->andReturn($data);
 
-        // Agora executa o serviço sem tentar mockar o upload
         $result = $this->productService->createProduct($data);
 
         $this->assertEquals($data, $result);
